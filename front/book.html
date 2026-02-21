@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📚 Book Reading List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="book.css">
+</head>
+<body>
+
+<header>
+  <h1>📚 Book Reading List</h1>
+  <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+</header>
+
+<div class="quote" id="quote"></div>
+
+<div class="counter">
+  <div>📖 Total Books: <span id="total">0</span></div>
+  <div>✅ Completed: <span id="completed">0</span></div>
+</div>
+
+<div class="form-container">
+  <input type="text" id="title" placeholder="📘 Book Name">
+  <input type="text" id="author" placeholder="✍ Author Name">
+  <textarea id="description" placeholder="📝 Description"></textarea>
+
+  <select id="age">
+    <option value="">Select Age</option>
+    <option>15</option>
+    <option>20</option>
+    <option>30</option>
+    <option>40</option>
+    <option>60+</option>
+  </select>
+
+  <select id="genre">
+    <option value="">Select Genre</option>
+    <option>📘 Education</option>
+    <option>🏺 History</option>
+    <option>🧙 Fantasy</option>
+    <option>🚀 Science Fiction</option>
+    <option>🕵 Mystery</option>
+    <option>👻 Horror</option>
+    <option>❤️ Romance</option>
+    <option>🔥 Thriller</option>
+  </select>
+
+  <button class="add-btn" onclick="addBook()">➕ Add Book</button>
+</div>
+
+<div class="book-list" id="bookList"></div>
+
+<footer>
+  <h2>📚 Book Suggestions</h2>
+  <div class="footer-books">
+    <div class="footer-card">
+      📖 The Alchemist – Paulo Coelho  
+      ✨ A magical journey of destiny and dreams.
+    </div>
+    <div class="footer-card">
+      📘 Atomic Habits – James Clear  
+      💡 Practical guide to building powerful habits.
+    </div>
+    <div class="footer-card">
+      🚀 Dune – Frank Herbert  
+      🌌 Epic science fiction adventure in space.
+    </div>
+    <div class="footer-card">
+      🕵 Sherlock Holmes – Arthur Conan Doyle  
+      🔍 Classic detective mystery collection.
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">
+  🎉 Book Completed Successfully! ✨
+</div>
+
+<script src="book.js"></script>
+</body>
+</html>
