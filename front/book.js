@@ -1,128 +1,134 @@
-const API = "http://localhost:3000/books";
-let books = [];
+// book.js
 
-let quotes = [
-  "📖 A reader lives a thousand lives.",
-  "📚 Books are a uniquely portable magic.",
-  "✨ Reading is dreaming with open eyes.",
-  "📘 Today a reader, tomorrow a leader."
-];
+// DOM elements
+const bookNameInput = document.getElementById("book-name");
+const authorInput = document.getElementById("author-name");
+const descInput = document.getElementById("book-desc");
+const ageSelect = document.getElementById("age-group");
+const genreSelect = document.getElementById("genre");
+const addBtn = document.getElementById("add-btn");
+const bookList = document.getElementById("booklist");
+const totalSpan = document.getElementById("total");
+const completedSpan = document.getElementById("completed");
+const themeToggle = document.getElementById("theme-toggle");
 
-document.getElementById("quote").innerText =
-  quotes[Math.floor(Math.random() * quotes.length)];
+const API_URL = "http://localhost:3000/books";
 
-/* ---------------- FETCH ALL BOOKS ---------------- */
+// 1. Fetch all books from MongoDB on load
 async function fetchBooks() {
-  const res = await fetch(API);
-  books = await res.json();
-  renderBooks();
+    try {
+        const response = await fetch(API_URL);
+        const books = await response.json();
+        bookList.innerHTML = ""; // Clear list
+        books.forEach(renderBook);
+        updateStats(books);
+    } catch (err) {
+        console.error("Error fetching books:", err);
+    }
 }
 
-fetchBooks();
-
-/* ---------------- THEME ---------------- */
-function toggleTheme(){
-  document.body.classList.toggle("dark");
+// 2. Update Stats (Now takes books array as argument)
+function updateStats(books) {
+    totalSpan.textContent = books.length;
+    completedSpan.textContent = books.filter(b => b.completed).length;
 }
 
-/* ---------------- ADD BOOK ---------------- */
-async function addBook(){
-  let title = document.getElementById("title").value;
-  let author = document.getElementById("author").value;
-  let description = document.getElementById("description").value;
-  let age = document.getElementById("age").value;
-  let genre = document.getElementById("genre").value;
+// 3. Render a single book
+function renderBook(book) {
+    const li = document.createElement("li");
+    li.className = "book-item";
+    if (book.completed) li.classList.add("completed");
 
-  if(!title || !author || !description || !age || !genre){
-    alert("⚠ Please fill all fields!");
-    return;
-  }
-
-  await fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, author, description, age, genre })
-  });
-
-  clearForm();
-  fetchBooks();
-}
-
-/* ---------------- RENDER ---------------- */
-function renderBooks(){
-  let list = document.getElementById("bookList");
-  list.innerHTML="";
-
-  books.forEach(book => {
-    let div=document.createElement("div");
-    div.className="book-card";
-    if(book.completed) div.classList.add("completed");
-
-    div.innerHTML=`
-      <h3>📘 ${book.title}</h3>
-      <p>✍ ${book.author}</p>
-      <p>📝 ${book.description}</p>
-      <p>👥 Age: ${book.age}</p>
-      <p>🏷 ${book.genre}</p>
-      <button onclick="completeBook('${book._id}')">✅ Complete</button>
-      <button onclick="editBook('${book._id}')">✏ Edit</button>
-      <button onclick="deleteBook('${book._id}')">🗑 Delete</button>
+    li.innerHTML = `
+        <div class="book-info">
+            📚 <b>${book.name}</b> by ✍️ ${book.author}<br>
+            📝 ${book.desc}<br>
+            🎯 Age: ${book.age}+ | Genre: ${book.genre}
+        </div>
+        <div class="book-buttons">
+            <button class="complete-btn">${book.completed ? "✅" : "✔️"}</button>
+            <button class="edit-btn">✏️</button>
+            <button class="delete-btn">🗑️</button>
+        </div>
     `;
 
-    list.appendChild(div);
-  });
+    // --- Button Logic with API Calls ---
 
-  document.getElementById("total").innerText = books.length;
-  document.getElementById("completed").innerText =
-    books.filter(b=>b.completed).length;
+    // Toggle Complete (PUT)
+    li.querySelector(".complete-btn").onclick = async () => {
+        try {
+            await fetch(`${API_URL}/${book._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ completed: !book.completed })
+            });
+            fetchBooks(); // Refresh list
+        } catch (err) { console.error(err); }
+    };
+
+    // Delete (DELETE)
+    li.querySelector(".delete-btn").onclick = async () => {
+        try {
+            await fetch(`${API_URL}/${book._id}`, { method: "DELETE" });
+            fetchBooks(); // Refresh list
+        } catch (err) { console.error(err); }
+    };
+
+    // Edit (Pre-fill form and Delete from DB)
+    li.querySelector(".edit-btn").onclick = async () => {
+        bookNameInput.value = book.name;
+        authorInput.value = book.author;
+        descInput.value = book.desc;
+        ageSelect.value = book.age;
+        genreSelect.value = book.genre;
+        
+        await fetch(`${API_URL}/${book._id}`, { method: "DELETE" });
+        fetchBooks();
+    };
+
+    bookList.appendChild(li);
 }
 
-/* ---------------- COMPLETE ---------------- */
-async function completeBook(id){
-  await fetch(`${API}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ completed: true })
-  });
+// 4. Add book button (POST)
+addBtn.addEventListener("click", async () => {
+    const bookData = {
+        name: bookNameInput.value.trim(),
+        author: authorInput.value.trim(),
+        desc: descInput.value.trim(),
+        age: ageSelect.value,
+        genre: genreSelect.value,
+        completed: false
+    };
 
-  fetchBooks();
-  showToast();
-}
+    if (!bookData.name || !bookData.author || !bookData.desc) {
+        alert("⚠️ Please fill in all book details!");
+        return;
+    }
 
-/* ---------------- DELETE ---------------- */
-async function deleteBook(id){
-  await fetch(`${API}/${id}`, {
-    method: "DELETE"
-  });
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookData)
+        });
 
-  fetchBooks();
-}
+        if (response.ok) {
+            // Reset form
+            bookNameInput.value = "";
+            authorInput.value = "";
+            descInput.value = "";
+            fetchBooks(); // Refresh UI
+        }
+    } catch (err) {
+        console.error("Error saving book:", err);
+    }
+});
 
-/* ---------------- EDIT ---------------- */
-function editBook(id){
-  const book = books.find(b => b._id === id);
+// Initial load
+fetchBooks();
 
-  document.getElementById("title").value = book.title;
-  document.getElementById("author").value = book.author;
-  document.getElementById("description").value = book.description;
-  document.getElementById("age").value = book.age;
-  document.getElementById("genre").value = book.genre;
-
-  deleteBook(id);
-}
-
-/* ---------------- CLEAR FORM ---------------- */
-function clearForm(){
-  document.getElementById("title").value="";
-  document.getElementById("author").value="";
-  document.getElementById("description").value="";
-  document.getElementById("age").value="";
-  document.getElementById("genre").value="";
-}
-
-/* ---------------- TOAST ---------------- */
-function showToast(){
-  let toast=document.getElementById("toast");
-  toast.style.display="block";
-  setTimeout(()=>{toast.style.display="none";},2000);
-}
+// Theme toggle
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    themeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+});

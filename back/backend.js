@@ -1,49 +1,72 @@
+// backend.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const Book = require("./model/read");
-
+// Create Express app
 const app = express();
-app.use(cors());
-app.use(express.json());
+const PORT = 3000;
 
-/* ------------------ DATABASE CONNECTION ------------------ */
+// Middleware
+app.use(cors());           // Enable CORS
+app.use(express.json());   // Parse JSON bodies
+
+// --- MongoDB Connection ---
 mongoose.connect("mongodb://127.0.0.1:27017/bookDB")
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.log(err));
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => console.error("❌ MongoDB connection error:", err));
 
-/* ------------------ ROUTES ------------------ */
+// --- Import Book Schema ---
+const Book = require("./model/read"); // make sure this path matches your folder
+
+// --- Routes ---
 
 // GET all books
 app.get("/books", async (req, res) => {
-  const books = await Book.find();
-  res.json(books);
+    try {
+        const books = await Book.find();
+        res.json(books);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// ADD new book
+// POST add new book
 app.post("/books", async (req, res) => {
-  const newBook = new Book(req.body);
-  await newBook.save();
-  res.json(newBook);
+    try {
+        const newBook = new Book(req.body); // expects name, author, desc, age, genre, completed
+        await newBook.save();
+        res.status(201).json(newBook);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// UPDATE book (complete/edit)
+// PUT update book (completed toggle or edit book info)
 app.put("/books/:id", async (req, res) => {
-  const updatedBook = await Book.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  );
-  res.json(updatedBook);
+    try {
+        const updatedBook = await Book.findByIdAndUpdate(
+            req.params.id,  // MongoDB _id
+            req.body,       // fields to update
+            { new: true }   // return updated document
+        );
+        res.json(updatedBook);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // DELETE book
 app.delete("/books/:id", async (req, res) => {
-  await Book.findByIdAndDelete(req.params.id);
-  res.json({ message: "Book deleted" });
+    try {
+        await Book.findByIdAndDelete(req.params.id);
+        res.json({ message: "Book deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server running on port 3000");
+// --- Start server ---
+app.listen(PORT, () => {
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

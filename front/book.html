@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>📚 Book Reading List</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="book.css">
+    <meta charset="UTF-8">
+    <title>Book Reading List</title>
+    <link rel="stylesheet" href="book.css">
 </head>
 <body>
 
-<header>
-  <h1>📚 Book Reading List</h1>
-  <button class="theme-btn" onclick="toggleTheme()">🌙</button>
-</header>
+<div class="container">
 
-<div class="quote" id="quote"></div>
+    <!-- Main Section -->
+    <div class="book-container">
 
-<div class="counter">
-  <div>📖 Total Books: <span id="total">0</span></div>
-  <div>✅ Completed: <span id="completed">0</span></div>
-</div>
+        <div class="header">
+            <div>
+                <h2>📚 My Book List</h2>
+                <p class="tagline">Read, Learn & Grow! 📖</p>
+            </div>
+            <button id="theme-toggle">🌙</button>
+        </div>
 
-<div class="form-container">
-  <input type="text" id="title" placeholder="📘 Book Name">
-  <input type="text" id="author" placeholder="✍ Author Name">
-  <textarea id="description" placeholder="📝 Description"></textarea>
+        <!-- Book Input Form -->
+        <div class="input-area">
+            <input type="text" id="book-name" placeholder="Book Name">
+            <input type="text" id="author-name" placeholder="Author Name">
+            <textarea id="book-desc" placeholder="Description"></textarea>
+            <select id="age-group">
+                <option value="15">15+</option>
+                <option value="20">20+</option>
+                <option value="30">30+</option>
+                <option value="40">40+</option>
+                <option value="60">60+</option>
+            </select>
+            <select id="genre">
+                <option value="Education">Education</option>
+                <option value="History">History</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Science Fiction">Science Fiction</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Horror">Horror</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller">Thriller</option>
+            </select>
+            <button id="add-btn">➕ Add Book</button>
+        </div>
 
-  <select id="age">
-    <option value="">Select Age</option>
-    <option>15</option>
-    <option>20</option>
-    <option>30</option>
-    <option>40</option>
-    <option>60+</option>
-  </select>
+        <!-- Stats -->
+        <div class="stats">
+            <p>Total: <span id="total">0</span></p>
+            <p>Completed: <span id="completed">0</span></p>
+        </div>
 
-  <select id="genre">
-    <option value="">Select Genre</option>
-    <option>📘 Education</option>
-    <option>🏺 History</option>
-    <option>🧙 Fantasy</option>
-    <option>🚀 Science Fiction</option>
-    <option>🕵 Mystery</option>
-    <option>👻 Horror</option>
-    <option>❤️ Romance</option>
-    <option>🔥 Thriller</option>
-  </select>
+        <!-- Book List -->
+        <ul id="booklist"></ul>
 
-  <button class="add-btn" onclick="addBook()">➕ Add Book</button>
-</div>
+        <!-- Footer: Default Books -->
+        <div class="footer">
+            <h3>📖 Featured Books</h3>
+            <div class="footer-book">
+                <p>Book: The Alchemist</p>
+                <p>Author: Paulo Coelho</p>
+                <p>Quote: "It's the possibility of having a dream come true that makes life interesting."</p>
+            </div>
+            <div class="footer-book">
+                <p>Book: 1984</p>
+                <p>Author: George Orwell</p>
+                <p>Quote: "Big Brother is Watching You."</p>
+            </div>
+            <div class="footer-book">
+                <p>Book: Harry Potter</p>
+                <p>Author: J.K. Rowling</p>
+                <p>Quote: "It is our choices that show what we truly are, far more than our abilities."</p>
+            </div>
+            <div class="footer-book">
+                <p>Book: Pride and Prejudice</p>
+                <p>Author: Jane Austen</p>
+                <p>Quote: "I declare after all there is no enjoyment like reading!"</p>
+            </div>
+        </div>
 
-<div class="book-list" id="bookList"></div>
-
-<footer>
-  <h2>📚 Book Suggestions</h2>
-  <div class="footer-books">
-    <div class="footer-card">
-      📖 The Alchemist – Paulo Coelho  
-      ✨ A magical journey of destiny and dreams.
     </div>
-    <div class="footer-card">
-      📘 Atomic Habits – James Clear  
-      💡 Practical guide to building powerful habits.
-    </div>
-    <div class="footer-card">
-      🚀 Dune – Frank Herbert  
-      🌌 Epic science fiction adventure in space.
-    </div>
-    <div class="footer-card">
-      🕵 Sherlock Holmes – Arthur Conan Doyle  
-      🔍 Classic detective mystery collection.
-    </div>
-  </div>
-</footer>
 
-<div class="toast" id="toast">
-  🎉 Book Completed Successfully! ✨
 </div>
 
 <script src="book.js"></script>
