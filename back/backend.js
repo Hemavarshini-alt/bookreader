@@ -1,77 +1,74 @@
-// backend.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const Book = require("./model/read");
 
-// Create Express app
 const app = express();
 
-// Use PORT from environment or fallback to 3000
-const PORT = process.env.PORT || 3000;
-
 // Middleware
-app.use(cors());           // Enable CORS
-app.use(express.json());   // Parse JSON bodies
+app.use(cors());
+app.use(express.json());
 
-// --- MongoDB Connection ---
-mongoose
-  .connect(
-    "mongodb+srv://Hemavarshini:Hemavarshini@cluster0.m86owho.mongodb.net/bookdb?appName=Cluster0"
-  )
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// MongoDB Connection
+mongoose.connect("mongodb://127.0.0.1:27017/bookreader")
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => console.log("❌ MongoDB Error:", err));
 
-// --- Import Book Schema ---
-const Book = require("./model/read"); // ensure this path is correct
+// ===============================
+// CRUD ROUTES
+// ===============================
 
-// --- Routes ---
-
-// GET all books
-app.get("/books", async (req, res) => {
-  try {
-    const books = await Book.find();
-    res.json(books);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST add new book
+// ✅ CREATE BOOK
 app.post("/books", async (req, res) => {
-  try {
-    const newBook = new Book(req.body); // expects name, author, desc, age, genre, completed
-    await newBook.save();
-    res.status(201).json(newBook);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const newBook = new Book(req.body);
+        const savedBook = await newBook.save();
+        res.status(201).json(savedBook);
+    } catch (error) {
+        res.status(500).json({ message: "Error saving book" });
+    }
 });
 
-// PUT update book (completed toggle or edit book info)
+// ✅ GET ALL BOOKS
+app.get("/books", async (req, res) => {
+    try {
+        const books = await Book.find().sort({ createdAt: -1 });
+        res.json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching books" });
+    }
+});
+
+// ✅ UPDATE BOOK
 app.put("/books/:id", async (req, res) => {
-  try {
-    const updatedBook = await Book.findByIdAndUpdate(
-      req.params.id,  // MongoDB _id
-      req.body,       // fields to update
-      { new: true }   // return updated document
-    );
-    res.json(updatedBook);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const updatedBook = await Book.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
+        res.json(updatedBook);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating book" });
+    }
 });
 
-// DELETE book
+// ✅ DELETE BOOK
 app.delete("/books/:id", async (req, res) => {
-  try {
-    await Book.findByIdAndDelete(req.params.id);
-    res.json({ message: "Book deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        await Book.findByIdAndDelete(req.params.id);
+        res.json({ message: "Book deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting book" });
+    }
 });
 
-// --- Start server ---
+// ===============================
+// START SERVER
+// ===============================
+
+const PORT = 3000;
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
