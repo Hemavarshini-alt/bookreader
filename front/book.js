@@ -12,31 +12,30 @@ const completedSpan = document.getElementById("completed");
 const themeToggle = document.getElementById("theme-toggle");
 
 let books = [];
-let editId = null; // 🔥 important for edit mode
+let editId = null;
 
+// Update stats
 function updateStats() {
     totalSpan.textContent = books.length;
     completedSpan.textContent = books.filter(b => b.completed).length;
 }
 
-// ================= FETCH ALL =================
+// Fetch all books
 async function fetchBooks() {
     const res = await fetch(API);
     const data = await res.json();
-
     books = data;
     bookList.innerHTML = "";
     books.forEach(renderBook);
     updateStats();
 }
 
-// ================= ADD OR UPDATE =================
-addBtn.addEventListener("click", async function () {
-
+// Add or Update book
+addBtn.addEventListener("click", async () => {
     const bookData = {
-        name: bookNameInput.value,
-        author: authorInput.value,
-        desc: descInput.value,
+        name: bookNameInput.value.trim(),
+        author: authorInput.value.trim(),
+        desc: descInput.value.trim(),
         age: ageSelect.value,
         genre: genreSelect.value
     };
@@ -47,17 +46,16 @@ addBtn.addEventListener("click", async function () {
     }
 
     if (editId) {
-        // 🔥 UPDATE
+        // UPDATE
         await fetch(`${API}/${editId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bookData)
         });
-
         editId = null;
-        addBtn.textContent = "Add Book";
+        addBtn.textContent = "➕ Add Book";
     } else {
-        // 🔥 CREATE
+        // CREATE
         await fetch(API, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -69,7 +67,7 @@ addBtn.addEventListener("click", async function () {
     fetchBooks();
 });
 
-// ================= RENDER =================
+// Render book item
 function renderBook(book) {
     const li = document.createElement("li");
 
@@ -82,8 +80,8 @@ function renderBook(book) {
 
     // COMPLETE
     const completeBtn = document.createElement("button");
-    completeBtn.textContent = "✅";
-    completeBtn.onclick = async function () {
+    completeBtn.textContent = book.completed ? "✅" : "⬜";
+    completeBtn.onclick = async () => {
         await fetch(`${API}/${book._id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -95,13 +93,12 @@ function renderBook(book) {
     // EDIT
     const editBtn = document.createElement("button");
     editBtn.textContent = "✏️";
-    editBtn.onclick = function () {
+    editBtn.onclick = () => {
         bookNameInput.value = book.name;
         authorInput.value = book.author;
         descInput.value = book.desc;
         ageSelect.value = book.age;
         genreSelect.value = book.genre;
-
         editId = book._id;
         addBtn.textContent = "Update Book";
     };
@@ -109,16 +106,12 @@ function renderBook(book) {
     // DELETE
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "🗑️";
-    deleteBtn.onclick = async function () {
-        await fetch(`${API}/${book._id}`, {
-            method: "DELETE"
-        });
+    deleteBtn.onclick = async () => {
+        await fetch(`${API}/${book._id}`, { method: "DELETE" });
         fetchBooks();
     };
 
-    if (book.completed) {
-        li.classList.add("completed");
-    }
+    if (book.completed) li.classList.add("completed");
 
     li.appendChild(completeBtn);
     li.appendChild(info);
@@ -128,21 +121,20 @@ function renderBook(book) {
     bookList.appendChild(li);
 }
 
-// ================= CLEAR FORM =================
+// Clear form
 function clearForm() {
     bookNameInput.value = "";
     authorInput.value = "";
     descInput.value = "";
-    ageSelect.value = "";
-    genreSelect.value = "";
+    ageSelect.value = "15";
+    genreSelect.value = "Education";
 }
 
-// ================= LOAD ON REFRESH =================
+// Load on page load
 fetchBooks();
 
-// ================= THEME =================
-themeToggle.addEventListener("click", function () {
+// Theme toggle
+themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-    themeToggle.textContent =
-        document.body.classList.contains("dark") ? "☀" : "🌙";
+    themeToggle.textContent = document.body.classList.contains("dark") ? "☀" : "🌙";
 });

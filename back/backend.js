@@ -1,74 +1,65 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const Book = require("./model/read");
+const Book = require("./model/read"); // schema
 
 const app = express();
-
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
+// MongoDB connection
 mongoose.connect("mongodb://127.0.0.1:27017/bookreader")
-    .then(() => console.log("✅ MongoDB Connected"))
-    .catch(err => console.log("❌ MongoDB Error:", err));
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ MongoDB Error:", err));
 
-// ===============================
 // CRUD ROUTES
-// ===============================
 
-// ✅ CREATE BOOK
+// CREATE
 app.post("/books", async (req, res) => {
     try {
         const newBook = new Book(req.body);
         const savedBook = await newBook.save();
         res.status(201).json(savedBook);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ message: "Error saving book" });
     }
 });
 
-// ✅ GET ALL BOOKS
+// READ ALL
 app.get("/books", async (req, res) => {
     try {
         const books = await Book.find().sort({ createdAt: -1 });
         res.json(books);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ message: "Error fetching books" });
     }
 });
 
-// ✅ UPDATE BOOK
+// UPDATE
 app.put("/books/:id", async (req, res) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true }
+            { new: true, runValidators: true }
         );
+        if (!updatedBook) return res.status(404).json({ message: "Book not found" });
         res.json(updatedBook);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ message: "Error updating book" });
     }
 });
 
-// ✅ DELETE BOOK
+// DELETE
 app.delete("/books/:id", async (req, res) => {
     try {
-        await Book.findByIdAndDelete(req.params.id);
+        const deletedBook = await Book.findByIdAndDelete(req.params.id);
+        if (!deletedBook) return res.status(404).json({ message: "Book not found" });
         res.json({ message: "Book deleted successfully" });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ message: "Error deleting book" });
     }
 });
 
-// ===============================
-// START SERVER
-// ===============================
-
 const PORT = 3000;
-
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
