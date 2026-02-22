@@ -1,6 +1,5 @@
-// book.js
+const API = "http://localhost:3000/books";
 
-// DOM elements
 const bookNameInput = document.getElementById("book-name");
 const authorInput = document.getElementById("author-name");
 const descInput = document.getElementById("book-desc");
@@ -12,123 +11,138 @@ const totalSpan = document.getElementById("total");
 const completedSpan = document.getElementById("completed");
 const themeToggle = document.getElementById("theme-toggle");
 
-const API_URL = "http://localhost:3000/books";
+let books = [];
+let editId = null; // 🔥 important for edit mode
 
-// 1. Fetch all books from MongoDB on load
-async function fetchBooks() {
-    try {
-        const response = await fetch(API_URL);
-        const books = await response.json();
-        bookList.innerHTML = ""; // Clear list
-        books.forEach(renderBook);
-        updateStats(books);
-    } catch (err) {
-        console.error("Error fetching books:", err);
-    }
-}
-
-// 2. Update Stats (Now takes books array as argument)
-function updateStats(books) {
+function updateStats() {
     totalSpan.textContent = books.length;
     completedSpan.textContent = books.filter(b => b.completed).length;
 }
 
-// 3. Render a single book
+// ================= FETCH ALL =================
+async function fetchBooks() {
+    const res = await fetch(API);
+    const data = await res.json();
+
+    books = data;
+    bookList.innerHTML = "";
+    books.forEach(renderBook);
+    updateStats();
+}
+
+// ================= ADD OR UPDATE =================
+addBtn.addEventListener("click", async function () {
+
+    const bookData = {
+        name: bookNameInput.value,
+        author: authorInput.value,
+        desc: descInput.value,
+        age: ageSelect.value,
+        genre: genreSelect.value
+    };
+
+    if (!bookData.name || !bookData.author || !bookData.desc) {
+        alert("Please fill all details!");
+        return;
+    }
+
+    if (editId) {
+        // 🔥 UPDATE
+        await fetch(`${API}/${editId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookData)
+        });
+
+        editId = null;
+        addBtn.textContent = "Add Book";
+    } else {
+        // 🔥 CREATE
+        await fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...bookData, completed: false })
+        });
+    }
+
+    clearForm();
+    fetchBooks();
+});
+
+// ================= RENDER =================
 function renderBook(book) {
     const li = document.createElement("li");
-    li.className = "book-item";
-    if (book.completed) li.classList.add("completed");
 
-    li.innerHTML = `
-        <div class="book-info">
-            📚 <b>${book.name}</b> by ✍️ ${book.author}<br>
-            📝 ${book.desc}<br>
-            🎯 Age: ${book.age}+ | Genre: ${book.genre}
-        </div>
-        <div class="book-buttons">
-            <button class="complete-btn">${book.completed ? "✅" : "✔️"}</button>
-            <button class="edit-btn">✏️</button>
-            <button class="delete-btn">🗑️</button>
-        </div>
+    const info = document.createElement("span");
+    info.innerHTML = `
+        📚 <b>${book.name}</b> by ${book.author}<br>
+        📝 ${book.desc}<br>
+        🎯 Age: ${book.age}+ | Genre: ${book.genre}
     `;
 
-    // --- Button Logic with API Calls ---
-
-    // Toggle Complete (PUT)
-    li.querySelector(".complete-btn").onclick = async () => {
-        try {
-            await fetch(`${API_URL}/${book._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ completed: !book.completed })
-            });
-            fetchBooks(); // Refresh list
-        } catch (err) { console.error(err); }
+    // COMPLETE
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = "✅";
+    completeBtn.onclick = async function () {
+        await fetch(`${API}/${book._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed: !book.completed })
+        });
+        fetchBooks();
     };
 
-    // Delete (DELETE)
-    li.querySelector(".delete-btn").onclick = async () => {
-        try {
-            await fetch(`${API_URL}/${book._id}`, { method: "DELETE" });
-            fetchBooks(); // Refresh list
-        } catch (err) { console.error(err); }
-    };
-
-    // Edit (Pre-fill form and Delete from DB)
-    li.querySelector(".edit-btn").onclick = async () => {
+    // EDIT
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.onclick = function () {
         bookNameInput.value = book.name;
         authorInput.value = book.author;
         descInput.value = book.desc;
         ageSelect.value = book.age;
         genreSelect.value = book.genre;
-        
-        await fetch(`${API_URL}/${book._id}`, { method: "DELETE" });
+
+        editId = book._id;
+        addBtn.textContent = "Update Book";
+    };
+
+    // DELETE
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.onclick = async function () {
+        await fetch(`${API}/${book._id}`, {
+            method: "DELETE"
+        });
         fetchBooks();
     };
+
+    if (book.completed) {
+        li.classList.add("completed");
+    }
+
+    li.appendChild(completeBtn);
+    li.appendChild(info);
+    li.appendChild(editBtn);
+    li.appendChild(deleteBtn);
 
     bookList.appendChild(li);
 }
 
-// 4. Add book button (POST)
-addBtn.addEventListener("click", async () => {
-    const bookData = {
-        name: bookNameInput.value.trim(),
-        author: authorInput.value.trim(),
-        desc: descInput.value.trim(),
-        age: ageSelect.value,
-        genre: genreSelect.value,
-        completed: false
-    };
+// ================= CLEAR FORM =================
+function clearForm() {
+    bookNameInput.value = "";
+    authorInput.value = "";
+    descInput.value = "";
+    ageSelect.value = "";
+    genreSelect.value = "";
+}
 
-    if (!bookData.name || !bookData.author || !bookData.desc) {
-        alert("⚠️ Please fill in all book details!");
-        return;
-    }
-
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(bookData)
-        });
-
-        if (response.ok) {
-            // Reset form
-            bookNameInput.value = "";
-            authorInput.value = "";
-            descInput.value = "";
-            fetchBooks(); // Refresh UI
-        }
-    } catch (err) {
-        console.error("Error saving book:", err);
-    }
-});
-
-// Initial load
+// ================= LOAD ON REFRESH =================
 fetchBooks();
 
-// Theme toggle
-themeToggle.addEventListener("click", () => {
+// ================= THEME =================
+themeToggle.addEventListener("click", function () {
     document.body.classList.toggle("dark");
-    themeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    themeToggle.textContent =
+        document.body.classList.contains("dark") ? "☀" : "🌙";
 });
