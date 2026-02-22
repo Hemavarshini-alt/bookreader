@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect("mongodb+srv://Hemavarshini:Hemavarshini@cluster0.m86owho.mongodb.net/bookdb?appName=Cluster0")
+mongoose.connect("mongodb://127.0.0.1:27017/bookreader")
     .then(() => console.log("✅ MongoDB Connected"))
     .catch(err => console.log("❌ MongoDB Error:", err));
 
@@ -67,7 +67,7 @@ app.delete("/books/:id", async (req, res) => {
 // START SERVER
 // ===============================
 
-//const PORT = 3000;
+const PORT = 3000;
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
