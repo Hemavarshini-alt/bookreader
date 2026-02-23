@@ -126,8 +126,8 @@ function clearForm() {
     bookNameInput.value = "";
     authorInput.value = "";
     descInput.value = "";
-    ageSelect.value = "15";
-    genreSelect.value = "Education";
+    ageSelect.value = "age";
+    genreSelect.value = "select";
 }
 
 // Load on page load
