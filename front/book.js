@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/books";
+const API = "https://bookreader-backend.onrender.com/books";
 
 const bookNameInput = document.getElementById("book-name");
 const authorInput = document.getElementById("author-name");
