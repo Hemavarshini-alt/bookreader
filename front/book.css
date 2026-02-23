@@ -85,6 +85,15 @@ h1, h2, h3 {
 }
 
 /* ===============================
+   COMPLETED / STRIKETHROUGH
+================================= */
+.completed {
+    text-decoration: line-through; /* strike through text */
+    opacity: 0.6;                  /* slightly faded */
+    color: #00ff88;                /* keep theme color */
+}
+
+/* ===============================
    INPUTS
 ================================= */
 input,
