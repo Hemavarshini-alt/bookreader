@@ -7,133 +7,215 @@
     box-sizing: border-box;
 }
 
+/* ===============================
+   BODY - DARK LIBRARY THEME
+================================= */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #000000;
-    color: #00ff88;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #050816, #0a0f2c);
+    color: #e0f2ff;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-x: hidden;
 }
 
 /* ===============================
-   SIDE DESIGN CIRCLES
-================================= */
-body::before,
-body::after {
-    content: "";
-    position: fixed;
-    width: 350px;
-    height: 350px;
-    border-radius: 50%;
-    background: #00ff88;
-    opacity: 0.2;
-    z-index: -1;
-}
-
-body::before {
-    top: -120px;
-    left: -120px;
-}
-
-body::after {
-    bottom: -120px;
-    right: -120px;
-}
-
-/* ===============================
-   CONTAINER
+   CONTAINER (LIBRARY SHELF)
 ================================= */
 .container {
-    width: 90%;
-    max-width: 900px;
-    padding: 30px;
+    width: 95%;
+    max-width: 1000px;
+    padding: 35px;
     border-radius: 20px;
-    background: #0f1f16;
-    border: 2px solid #00ff88;
-    box-shadow: 0 0 30px #00ff88;
+    background: #0d132f;
+    border: 2px solid #1e3a8a;
+    box-shadow: 0 0 40px rgba(30, 58, 138, 0.6);
 }
 
 /* ===============================
    HEADINGS
 ================================= */
-h1, h2, h3 {
-    color: #00ff88;
+h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: #60a5fa;
+}
+
+h2 {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    color: #3b82f6;
 }
 
 /* ===============================
-   BOOK BOXES
+   INPUT AREA
 ================================= */
-.book-box,
-.footer-book {
-    background: #001a12;
-    border-left: 6px solid #00ff88;
-    padding: 18px;
-    margin: 18px 0;
-    border-radius: 15px;
-    color: #00ff88;
-    transition: 0.3s ease;
-    animation: slideUp 0.6s ease;
+.input-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
 }
 
-.book-box:hover,
-.footer-book:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 20px #00ff88;
-}
-
-/* ===============================
-   COMPLETED / STRIKETHROUGH
-================================= */
-.completed {
-    text-decoration: line-through; /* strike through text */
-    opacity: 0.6;                  /* slightly faded */
-    color: #00ff88;                /* keep theme color */
-}
-
-/* ===============================
-   INPUTS
-================================= */
+/* Inputs styled like notebook fields */
 input,
 select,
 textarea {
-    background: #002b1c;
-    color: #00ff88;
-    border: 1px solid #00ff88;
-    padding: 8px;
-    border-radius: 6px;
+    background: #11183a;
+    color: #93c5fd;
+    border: 1px solid #2563eb;
+    padding: 10px;
+    border-radius: 8px;
+    width: 190px;
+    transition: 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Description same size */
+textarea {
+    height: 45px;
+    resize: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 12px #3b82f6;
+    transform: scale(1.05);
 }
 
 /* ===============================
    BUTTONS
 ================================= */
 button {
-    background: #00ff88;
-    color: black;
+    background: #2563eb;
+    color: white;
     border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
 }
 
 button:hover {
-    background: #00cc66;
-    box-shadow: 0 0 15px #00ff88;
+    background: #1d4ed8;
+    box-shadow: 0 0 15px #3b82f6;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* ===============================
+   REMOVE BULLETS
+================================= */
+ul {
+    list-style: none;
+}
+
+/* ===============================
+   BOOK CARD (LIKE A HARD BOOK)
+================================= */
+.book-box {
+    background: linear-gradient(145deg, #111c44, #0f1a3a);
+    border-left: 8px solid #2563eb;   /* Book spine */
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    transition: 0.4s ease;
+    animation: bookAppear 0.6s ease;
+    position: relative;
+}
+
+/* Hover lift */
+.book-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(37,99,235,0.5);
+}
+
+/* ===============================
+   BOOK TITLE
+================================= */
+.book-box h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #60a5fa;
+}
+
+/* ===============================
+   DESCRIPTION (LIKE BOOK PAGE)
+================================= */
+.book-description {
+    margin-top: 10px;
+    padding: 12px;
+    background: #0b1435;
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.6;
+    border-left: 4px solid #3b82f6;
+}
+
+/* ===============================
+   META INFO
+================================= */
+.book-meta {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #93c5fd;
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================= */
+.book-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+/* ===============================
+   COMPLETED BOOK STYLE
+================================= */
+.book-box.completed {
+    background: linear-gradient(145deg, #1e1b4b, #2b1055);
+    border-left: 8px solid #9333ea;
+    box-shadow: 0 8px 20px rgba(147,51,234,0.5);
+}
+
+.book-box.completed h3,
+.book-box.completed .book-description,
+.book-box.completed .book-meta {
+    text-decoration: line-through;
+    opacity: 0.7;
+    color: #c4b5fd;
+}
+
+/* ===============================
+   FEATURED BOOK SECTION
+================================= */
+.footer-book {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #162456, #1e3a8a);
+    border: 2px solid #3b82f6;
+    box-shadow: 0 0 25px #1e40af;
 }
 
 /* ===============================
    ANIMATION
 ================================= */
-@keyframes slideUp {
+@keyframes bookAppear {
     from {
-        transform: translateY(40px);
         opacity: 0;
+        transform: translateY(30px) rotateX(10deg);
     }
     to {
-        transform: translateY(0);
         opacity: 1;
+        transform: translateY(0) rotateX(0);
     }
 }
